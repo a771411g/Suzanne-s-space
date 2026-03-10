@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      :root {
+        --line-fill: #3498db;
+        --line-border-empty: gray;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        font-family: Arial, Helvetica, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        overflow: hidden;
+        margin: 0;
+      }
+      .container {
+        align-items: center;
+      }
+      .progress-container {
+        display: flex;
+        /* 把每個元素分開 */
+        justify-content: space-between;
+        position: relative;
+        margin-bottom: 30px;
+        max-width: 100%;
+        width: 350px;
+      }
+
+      .progress-container::before {
+        content: "";
+        background-color: var(--line-border-empty);
+        position: absolute;
+        top: 50%;
+        left: 0;
+        transform: translateY(-50%);
+        height: 4px;
+        width: 100%;
+        z-index: -1;
+      }
+      .progress {
+        background-color: var(--line-fill);
+        position: absolute;
+        top: 50%;
+        left: 0;
+        transform: translateY(-50%);
+        height: 4px;
+        width: 0%;
+        z-index: -1;
+        transition: 0.4s ease;
+      }
+
+      .circle {
+        background-color: #fff;
+        color: #999;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 3px solid var(--line-border-empty);
+        transition: 0.4s ease;
+      }
+
+      .circle.active {
+        border-color: var(--line-fill);
+      }
+
+      .btn {
+        background-color: var(--line-fill);
+        color: #fff;
+        border: 0;
+        border-radius: 6px;
+        cursor: pointer;
+        /* inherit 可以繼承父元素的字體 */
+        font-family: inherit;
+        padding: 8px 30px;
+        margin: 5px;
+        font-size: 14px;
+      }
+
+      .btn:active {
+        transform: scale(0.98);
+      }
+      .btn:focus {
+        outline: 0;
+      }
+      .btn:disabled {
+        background-color: var(--line-border-empty);
+        cursor: not-allowed;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="progress-container">
+        <div class="progress" id="progress"></div>
+        <div class="circle active">1</div>
+        <div class="circle">2</div>
+        <div class="circle">3</div>
+        <div class="circle">4</div>
+      </div>
+      <button class="btn" id="prev" disabled>Prev</button>
+      <button class="btn" id="next" next>Next</button>
+    </div>
+    <script>
+      const progress = document.getElementById("progress");
+      const prev = document.getElementById("prev");
+      const next = document.getElementById("next");
+      const circle = document.querySelectorAll(".circle");
+
+      let currentActive = 1;
+      next.addEventListener("click", () => {
+        currentActive++;
+
+        if (currentActive > circle.length) {
+          currentActive = circle.length;
+        }
+        updated();
+      });
+
+      prev.addEventListener("click", () => {
+        currentActive--;
+
+        if (currentActive < 1) {
+          currentActive = 1;
+        }
+
+        updated();
+      });
+
+      function updated() {
+        circle.forEach((circle, idx) => {
+          if (idx < currentActive) {
+            circle.classList.add("active");
+          } else {
+            circle.classList.remove("active");
+          }
+        });
+
+        const actives = document.querySelectorAll(".active");
+        // 轉換css
+        progress.style.width =
+          ((actives.length - 1) / (circle.length - 1)) * 100 + "%";
+
+        // 假設進度條在第一項則 上一頁不能按
+        // 到最後一頁時 下一頁不能按
+        // 其他情況為正常
+        if (currentActive === 1) {
+          prev.disabled = true;
+        } else if (currentActive === circle.length) {
+          next.disabled = true;
+        } else {
+          prev.disabled = false;
+          next.disabled = false;
+        }
+      }
+    </script>
+  </body>
+</html>
